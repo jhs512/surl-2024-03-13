@@ -1,12 +1,13 @@
 package com.ll.surl20240313.domain.member.member.entity;
 
 import com.ll.surl20240313.global.jpa.entity.BaseTime;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import static jakarta.persistence.GenerationType.IDENTITY;
@@ -28,18 +29,30 @@ public class Member extends BaseTime {
     private String refreshToken;
     private String nickname;
 
-    public String getName() {
-        return nickname;
+    @Transient
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return getAuthoritiesAsStringList()
+                .stream()
+                .map(SimpleGrantedAuthority::new)
+                .toList();
     }
 
+    @Transient
     public List<String> getAuthoritiesAsStringList() {
-        if (isAdmin()) List.of("ROLE_ADMIN", "ROLE_MEMBER");
+        List<String> authorities = new ArrayList<>();
 
-        return List.of("ROLE_MEMBER");
+        if (isAdmin())
+            authorities.add("ROLE_ADMIN");
+
+        return authorities;
     }
 
     private boolean isAdmin() {
         return username.equals("admin");
+    }
+
+    public String getName() {
+        return nickname;
     }
 }
 
