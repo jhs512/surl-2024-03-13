@@ -15,9 +15,9 @@ services:
       - ./dockerProjects/rabbitmq-1/volumes/var/lib/rabbitmq:/var/lib/rabbitmq
       - ./dockerProjects/rabbitmq-1/volumes/var/log/rabbitmq:/var/log/rabbitmq
     ports:
-      - "5672:5672"
-      - "15672:15672"
-      - "61613:61613"
+      - 5672:5672
+      - 15672:15672
+      - 61613:61613
     environment:
       RABBITMQ_DEFAULT_USER: admin
       RABBITMQ_DEFAULT_PASS: admin
@@ -87,9 +87,8 @@ services:
     image: getmeili/meilisearch:v1.7  # 사용할 이미지
     container_name: meilisearch-1  # 컨테이너 이름
     ports:
-      - "7700:7700"  # 호스트와 컨테이너의 포트 매핑
+      - 7700:7700
     volumes:
-      - ./dockerProjects/meilisearch/volumes/meili_data:/meili_data  # 호스트와 컨테이너의 볼륨 매핑
+      - ./dockerProjects/meilisearch-1/volumes/meili_data:/meili_data  # 호스트와 컨테이너의 볼륨 매핑
     environment:
       MEILI_ENV: development  # 환경 변수 설정
-    restart: unless-stopped  # 컨테이너 자동 재시작 정책

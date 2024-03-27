@@ -5,6 +5,7 @@ import com.ll.surl20240313.domain.chat.chat.service.ChatService;
 import com.ll.surl20240313.domain.member.member.entity.Member;
 import com.ll.surl20240313.domain.member.member.service.MemberService;
 import com.ll.surl20240313.domain.surl.surl.service.SurlService;
+import com.ll.surl20240313.domain.surl.surlDocument.service.SurlDocumentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +27,7 @@ public class NotProd {
     private final SurlService surlService;
     private final MemberService memberService;
     private final ChatService chatService;
+    private final SurlDocumentService surlDocumentService;
 
     @Bean
     public ApplicationRunner initNotProd() {
@@ -38,6 +40,8 @@ public class NotProd {
 
     @Transactional
     public void work1() {
+        surlDocumentService.clear();
+        
         Member memberSystem = memberService.create("system", "1234", "system");
         memberSystem.setRefreshToken("system");
 
