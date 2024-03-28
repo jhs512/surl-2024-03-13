@@ -1,17 +1,31 @@
 package com.ll.surl20240313.domain.surl.surl.controller;
 
+import com.ll.surl20240313.domain.surl.surl.dto.SurlDto;
 import com.ll.surl20240313.domain.surl.surl.entity.Surl;
 import com.ll.surl20240313.domain.surl.surl.service.SurlService;
+import com.ll.surl20240313.domain.surl.surlDocument.document.SurlDocument;
+import com.ll.surl20240313.domain.surl.surlDocument.service.SurlDocumentService;
+import com.ll.surl20240313.global.app.AppConfig;
 import com.ll.surl20240313.global.rq.Rq;
 import com.ll.surl20240313.global.rsData.RsData;
+import com.ll.surl20240313.standard.base.KwTypeV1;
+import com.ll.surl20240313.standard.base.PageDto;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.lang.NonNull;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/surls")
@@ -19,7 +33,34 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 public class ApiV1SurlController {
     private final SurlService surlService;
+    private final SurlDocumentService surlDocumentService;
     private final Rq rq;
+
+    public record GetSurlsResponseBody(@NonNull PageDto<SurlDto> itemPage) {
+    }
+
+    @GetMapping("")
+    public RsData<GetSurlsResponseBody> getSurls(
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "") String kw,
+            @RequestParam(defaultValue = "ALL") KwTypeV1 kwType
+    ) {
+        List<Sort.Order> sorts = new ArrayList<>();
+        sorts.add(Sort.Order.desc("rating"));
+        Pageable pageable = PageRequest.of(page - 1, AppConfig.getBasePageSize(), Sort.by(sorts));
+        Page<SurlDocument> itemPage = surlDocumentService.findByKw(kw, pageable);
+
+        Page<SurlDto> _itemPage = itemPage.map(
+                surlDocument -> new SurlDto(surlDocument)
+        );
+
+        return RsData.of(
+                new GetSurlsResponseBody(
+                        new PageDto<>(_itemPage)
+                )
+        );
+    }
+
 
     public record SurlCreateReqBody(@NotBlank String url, String title) {
     }
