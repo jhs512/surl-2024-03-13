@@ -3,6 +3,7 @@ package com.ll.surl20240313.domain.surl.surl.service;
 import com.ll.surl20240313.domain.member.member.entity.Member;
 import com.ll.surl20240313.domain.surl.surl.dto.SurlDto;
 import com.ll.surl20240313.domain.surl.surl.entity.Surl;
+import com.ll.surl20240313.domain.surl.surl.event.SurlCommonEvent;
 import com.ll.surl20240313.domain.surl.surl.repository.SurlRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -33,7 +34,9 @@ public class SurlService {
 
         surlRepository.save(surl);
 
-        template.send("AfterSurlCreatedEvent", new SurlDto(surl));
+        SurlCommonEvent surlCommonEvent = new SurlCommonEvent("afterCreated", new SurlDto(surl));
+        template.send("SurlCommonEvent", surlCommonEvent);
+        template.send("SurlAfterCreatedEvent", surlCommonEvent);
 
         return surl;
     }
@@ -47,12 +50,16 @@ public class SurlService {
         surl.setTitle(title);
         surl.setModified();
 
-        template.send("AfterSurlModifiedEvent", new SurlDto(surl));
+        SurlCommonEvent surlCommonEvent = new SurlCommonEvent("afterModified", new SurlDto(surl));
+        template.send("SurlCommonEvent", surlCommonEvent);
+        template.send("SurlAfterModifiedEvent", surlCommonEvent);
     }
 
     @Transactional
     public void delete(Surl surl) {
-        template.send("BeforeSurlDeletedEvent", new SurlDto(surl));
+        SurlCommonEvent surlCommonEvent = new SurlCommonEvent("beforeDeleted", new SurlDto(surl));
+        template.send("SurlCommonEvent", surlCommonEvent);
+        template.send("SurlBeforeDeletedEvent", surlCommonEvent);
 
         surlRepository.delete(surl);
     }
