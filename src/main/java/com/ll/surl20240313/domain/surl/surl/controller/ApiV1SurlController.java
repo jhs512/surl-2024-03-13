@@ -106,6 +106,7 @@ public class ApiV1SurlController {
             @PathVariable long id,
             @Valid @RequestBody SurlModifyReqBody reqBody
     ) {
-        surlService.modify(id, reqBody.title);
+        Surl surl = surlService.findById(id).orElseThrow(GlobalException.E404::new);
+        surlService.modify(surl, reqBody.title);
     }
 }
