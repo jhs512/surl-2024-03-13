@@ -52,6 +52,8 @@ public class SurlDocumentRepository {
     public void clear() {
         meilisearchConfig.meilisearchClient().deleteIndex(getIndexName());
         meilisearchConfig.meilisearchClient().createIndex(getIndexName(), "id");
+        getIndex().updateFilterableAttributesSettings(new String[]{"createTimeStamp"});
+        getIndex().updateSortableAttributesSettings(new String[]{"id"});
     }
 
     public List<SurlDocument> findByOrderByIdDesc() {
