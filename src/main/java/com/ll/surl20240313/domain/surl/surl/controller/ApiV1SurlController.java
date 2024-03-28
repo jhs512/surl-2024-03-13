@@ -6,6 +6,7 @@ import com.ll.surl20240313.domain.surl.surl.service.SurlService;
 import com.ll.surl20240313.domain.surl.surlDocument.document.SurlDocument;
 import com.ll.surl20240313.domain.surl.surlDocument.service.SurlDocumentService;
 import com.ll.surl20240313.global.app.AppConfig;
+import com.ll.surl20240313.global.exceptions.GlobalException;
 import com.ll.surl20240313.global.rq.Rq;
 import com.ll.surl20240313.global.rsData.RsData;
 import com.ll.surl20240313.standard.base.KwTypeV1;
@@ -61,6 +62,21 @@ public class ApiV1SurlController {
         );
     }
 
+
+    public record GetSurlResponseBody(@NonNull SurlDto item) {
+    }
+
+    @GetMapping("/{id}")
+    public RsData<GetSurlResponseBody> getPost(
+            @PathVariable long id
+    ) {
+        SurlDocument surlDocument = surlDocumentService.findById(id).orElseThrow(GlobalException.E404::new);
+        SurlDto dto = new SurlDto(surlDocument);
+
+        return RsData.of(
+                new GetSurlResponseBody(dto)
+        );
+    }
 
     public record SurlCreateReqBody(@NotBlank String url, String title) {
     }
